@@ -106,7 +106,7 @@ namespace WebStats.Persistence {
         /// <returns></returns>
         public List<VersionInfo> GetVersionDistribution(int serviceId) {
             List<VersionInfo> list = new List<VersionInfo>();
-            const string query = "SELECT `version`, COUNT(`uuid`) as N FROM versions WHERE modified_at > NOW() - interval 30 DAY AND id_service = @serviceId GROUP BY `version`";
+            const string query = "SELECT `version`, COUNT(`uuid`) as N FROM versions WHERE modified_at > NOW() - interval 30 DAY AND id_service = @serviceId GROUP BY `version` ORDER BY `version` DESC";
 
             using (MySqlConnection conn = GetConnection()) {
                 conn.Open();
