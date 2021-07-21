@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -32,17 +33,27 @@ public class AggregateDataCron : BackgroundService {
     }
 
     private void Process() {
-        Console.WriteLine("hello world" + DateTime.Now.ToString("F"));
-
         var serviceIdentifiers = _aggregator.ListServiceIdentifiers();
+        var existing = _aggregator.GetRecentAggregates();
         foreach (var serviceId in serviceIdentifiers) {
+
             for (int i = 1; i <= 7; i++) {
                 var d = RemoveTime(DateTimeOffset.UtcNow.AddDays(-i));
-                _aggregator.CreateAggregateEntry(serviceId, d);
+
+                var lt = RemoveTime(existing[6].Date) < d;
+                var gt = RemoveTime(existing[6].Date) > d;
+                var eq = RemoveTime(existing[6].Date) == d;
+                if (!existing.Any(e => e.ServiceId == serviceId && StupidDateEquals(e.Date, d))) {
+                    _aggregator.CreateAggregateEntry(serviceId, d);
+                }
             }
         }
 
         _aggregator.Cleanup();
+    }
+
+    private bool StupidDateEquals(DateTimeOffset a, DateTimeOffset b) {
+        return a.Year == b.Year && a.Month == b.Month && a.Day == b.Day;
     }
 
     // Surely this must exist from before?

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
+using WebStats.Persistence.Model;
 
 namespace WebStats.Persistence {
     public class Aggregator {
@@ -32,6 +33,31 @@ namespace WebStats.Persistence {
                 using (var reader = cmd.ExecuteReader()) {
                     while (reader.Read()) {
                         list.Add(Convert.ToInt32(reader["id_service"]));
+                    }
+                }
+            }
+
+            return list;
+        }
+
+
+        public List<AggregateInfo> GetRecentAggregates() {
+            const string query = "SELECT id_aggregate, id_service FROM aggregate WHERE id_aggregate > NOW() - interval 8 day";
+
+            List<AggregateInfo> list = new List<AggregateInfo>();
+            
+
+            using (MySqlConnection conn = GetConnection()) {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                using (var reader = cmd.ExecuteReader()) {
+                    while (reader.Read()) {
+                        DateTime dt = Convert.ToDateTime(reader["id_aggregate"]);
+                        list.Add(new AggregateInfo {
+                                ServiceId = Convert.ToInt32(reader["id_service"]),
+                                Date = DateTime.SpecifyKind(dt, DateTimeKind.Utc)
+                        });
                     }
                 }
             }

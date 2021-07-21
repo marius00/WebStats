@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
 using WebStats.Persistence;
+using WebStats.Persistence.Model;
 
 namespace WebStats.Pages {
     public class IndexModel : PageModel {

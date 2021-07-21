@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MySqlConnector;
+using WebStats.Persistence.Model;
 
 namespace WebStats.Persistence {
     public class WebstatsContext {
