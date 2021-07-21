@@ -1,10 +1,95 @@
-﻿@page
+﻿@page "{id}"
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = @Model.Title;
 }
+@inject IJsonHelper Json;
+
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">@Model.Title</h1>
+    @if (Model.ProjectUrl != "") {
+        <a href="@Html.Raw(Model.ProjectUrl)">Visit the project site</a>
+    }
+</div>
+<br/>
+<br />
+
+<div id="container"></div>
+
+
+<script>
+    var data = @Html.Raw(Json.Serialize(Model.History));
+
+    $(document).ready(function () {
+        $('#container').highcharts({
+            title: {
+                text: '@Model.Title users',
+                x: -20 //center
+            },
+            xAxis: {
+                categories: ['Days ago']
+            },
+            yAxis: {
+                title: {
+                    text: 'Users'
+                },
+                plotLines: [
+                    {
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }
+                ]
+            },
+            tooltip: {
+                valueSuffix: ' Users'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+                {
+                    name: '14 days',
+                    data: data.past14d
+                },
+                {
+                    name: '7 days',
+                    data: data.past7d
+                },
+                {
+                    name: '24 hours',
+                    data: data.past24H
+                },
+                {
+                    name: '30 days',
+                    data: data.past30d
+                }
+            ]
+        });
+    });
+</script>
+
+<br/>
+<br />
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover table-sm ">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Version</th>
+                <th scope="col">Users</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.VersionInfo) {
+                <tr>
+                    <td>@item.Version</td>
+                    <td>@item.NumUsers</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
