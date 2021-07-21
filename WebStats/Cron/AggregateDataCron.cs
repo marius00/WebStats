@@ -39,10 +39,6 @@ public class AggregateDataCron : BackgroundService {
 
             for (int i = 1; i <= 7; i++) {
                 var d = RemoveTime(DateTimeOffset.UtcNow.AddDays(-i));
-
-                var lt = RemoveTime(existing[6].Date) < d;
-                var gt = RemoveTime(existing[6].Date) > d;
-                var eq = RemoveTime(existing[6].Date) == d;
                 if (!existing.Any(e => e.ServiceId == serviceId && StupidDateEquals(e.Date, d))) {
                     _aggregator.CreateAggregateEntry(serviceId, d);
                 }
