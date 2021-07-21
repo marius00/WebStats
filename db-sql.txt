@@ -1,0 +1,78 @@
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Server version:               10.6.2-MariaDB - mariadb.org binary distribution
+-- Server OS:                    Win64
+-- HeidiSQL Version:             11.2.0.6213
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+-- Dumping database structure for webstats
+CREATE DATABASE IF NOT EXISTS `webstats` /*!40100 DEFAULT CHARACTER SET utf16 */;
+USE `webstats`;
+
+
+-- Dumping structure for table webstats.services
+CREATE TABLE IF NOT EXISTS `services` (
+  `id_service` int(11) NOT NULL AUTO_INCREMENT,
+  `description` varchar(255) NOT NULL COMMENT 'Title / header for the page',
+  `shortname` varchar(10) NOT NULL COMMENT 'Project code for the URL',
+  `project_url` varchar(255) DEFAULT NULL COMMENT 'Project URL',
+  PRIMARY KEY (`id_service`),
+  UNIQUE KEY `uq_service_shortname` (`shortname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+-- Dumping structure for table webstats.aggregate
+CREATE TABLE IF NOT EXISTS `aggregate` (
+  `id_aggregate` date NOT NULL,
+  `id_service` int(11) NOT NULL,
+  `num_24h` int(11) NOT NULL COMMENT 'Number of users the past 24 hours',
+  `num_7d` int(11) NOT NULL COMMENT 'Number of users the past 7 days',
+  `num_14d` int(11) NOT NULL COMMENT 'Number of users the past 14 days',
+  `num_30d` int(11) NOT NULL COMMENT 'Number of users the past 30 days',
+  PRIMARY KEY (`id_aggregate`,`id_service`) USING BTREE,
+  KEY `fk_aggregate_service` (`id_service`),
+  CONSTRAINT `fk_aggregate_service` FOREIGN KEY (`id_service`) REFERENCES `services` (`id_service`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table webstats.versions
+CREATE TABLE IF NOT EXISTS `versions` (
+  `id_service` int(11) NOT NULL DEFAULT 0,
+  `uuid` varchar(50) NOT NULL COMMENT 'Unique user ID',
+  `version` varchar(25) NOT NULL COMMENT 'Program/app version',
+  `modified_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id_service`,`uuid`),
+  CONSTRAINT `fk_versions_service` FOREIGN KEY (`id_service`) REFERENCES `services` (`id_service`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+
+
+CREATE TABLE `usageentry` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`uuid` VARCHAR(50) NOT NULL COLLATE 'utf16_general_ci',
+	`id_service` INT(11) NOT NULL,
+	`created_at` DATE NOT NULL DEFAULT current_timestamp(),
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `fk_usageentry_services` (`id_service`) USING BTREE,
+	CONSTRAINT `fk_usageentry_services` FOREIGN KEY (`id_service`) REFERENCES `webstats`.`services` (`id_service`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='utf16_general_ci'
+ENGINE=InnoDB
+;
