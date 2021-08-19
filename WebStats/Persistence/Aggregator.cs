@@ -88,10 +88,10 @@ namespace WebStats.Persistence {
 	        VALUES (
 		        @date, 
 		        @serviceId, 
-		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE created_at <= @date AND created_at >= @date - INTERVAL 24 HOUR), 
-		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE created_at <= @date AND created_at >= @date - INTERVAL 7 DAY), 
-		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE created_at <= @date AND created_at >= @date - INTERVAL 14 DAY), 
-		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE created_at <= @date AND created_at >= @date - INTERVAL 30 DAY)
+		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE id_service = @serviceId AND created_at <= @date AND created_at >= @date - INTERVAL 24 HOUR), 
+		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE id_service = @serviceId AND created_at <= @date AND created_at >= @date - INTERVAL 7 DAY), 
+		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE id_service = @serviceId AND created_at <= @date AND created_at >= @date - INTERVAL 14 DAY), 
+		        (SELECT COUNT(DISTINCT(`uuid`)) FROM usageentry WHERE id_service = @serviceId AND created_at <= @date AND created_at >= @date - INTERVAL 30 DAY)
 	        );";
 
             using (MySqlConnection conn = GetConnection()) {
