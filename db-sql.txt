@@ -68,7 +68,7 @@ CREATE TABLE `usageentry` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`uuid` VARCHAR(50) NOT NULL COLLATE 'utf16_general_ci',
 	`id_service` INT(11) NOT NULL,
-	`created_at` DATE NOT NULL DEFAULT current_timestamp(),
+	`created_at` DATE NOT NULL DEFAULT (curdate()),
 	PRIMARY KEY (`id`) USING BTREE,
 	INDEX `fk_usageentry_services` (`id_service`) USING BTREE,
 	CONSTRAINT `fk_usageentry_services` FOREIGN KEY (`id_service`) REFERENCES `webstats`.`services` (`id_service`) ON UPDATE RESTRICT ON DELETE RESTRICT
