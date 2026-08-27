@@ -20,6 +20,10 @@ namespace WebStats {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddRazorPages();
+
+            // Non-default: liveness probe for the container health check.
+            // Deliberately does not touch the database, restarting the app cannot fix a database outage.
+            services.AddHealthChecks();
             
             
             // Non-default
@@ -61,6 +65,9 @@ namespace WebStats {
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapRazorPages();
+
+                // Non-default
+                endpoints.MapHealthChecks("/health");
 
                 // Non-default
                 endpoints.MapControllerRoute(

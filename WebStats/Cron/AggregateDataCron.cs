@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using WebStats.Persistence;
 
 /// <summary>
@@ -12,15 +13,27 @@ using WebStats.Persistence;
 public class AggregateDataCron : BackgroundService {
     private DateTimeOffset _nextRun = DateTimeOffset.UtcNow;
     private readonly Aggregator _aggregator;
+    private readonly ILogger<AggregateDataCron> _logger;
 
-    public AggregateDataCron(Aggregator aggregator) {
+    public AggregateDataCron(Aggregator aggregator, ILogger<AggregateDataCron> logger) {
         _aggregator = aggregator;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
+        // Everything before the first await runs inside Host.StartAsync. Yielding first keeps a slow or
+        // failing aggregation run from delaying startup, or from taking the application down with it.
+        await Task.Yield();
+
         do {
             if (DateTimeOffset.UtcNow > _nextRun) {
-                Process();
+                try {
+                    Process();
+                }
+                catch (Exception e) {
+                    _logger?.LogError(e, "Aggregation run failed, retrying tomorrow");
+                }
+
                 _nextRun = DateTimeOffset.UtcNow.AddDays(1);
 
                 if (_nextRun.Hour != 2)
